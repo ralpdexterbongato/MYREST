@@ -28,15 +28,11 @@ const appRoutes: Routes = [
     data: { title: 'Projects' }
   },
   {
-    path: 'home',
+    path: '',
     component: LandingPageComponent,
     data: { title: 'Home' }
   },
-  {
-    path: '',
-    redirectTo:'/home',
-    pathMatch: 'full'
-  }
+
 ];
 @NgModule({
   declarations: [
