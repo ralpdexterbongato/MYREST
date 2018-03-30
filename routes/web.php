@@ -11,13 +11,4 @@
 |
 */
 
-Route::get('/', function () {
-    return view('master');
-});
-
-Route::resource('api/message','messagesController');
-
-Route::get('/api-csrf', function ()
-{
-  return ['token'=>csrf_token()];
-});
+Route::resource('/message','messagesController');

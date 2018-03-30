@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\message;
+use Session;
 class messagesController extends Controller
 {
     /**
@@ -34,13 +35,26 @@ class messagesController extends Controller
      */
     public function store(Request $request)
     {
-
+      $sent= Session::get('MessagedSentCounter');
+      if ($sent>2)
+      {
+        return ['error'=>'You have reach the maximum send.'];
+      }
       $messageDB = new message;
       $messageDB->fullname = $request->cfullname;
       $messageDB->email = $request->cemail;
       $messageDB->budget = $request->cbudget;
       $messageDB->message = $request->cmessage;
       $messageDB->save();
+      if (Session::has('MessagedSentCounter'))
+      {
+        $total = $sent + 1;
+        session(['MessagedSentCounter' => $total]);
+      }else
+      {
+        session(['MessagedSentCounter' =>1]);
+      }
+
       return ['success'=>'success'];
     }
 
@@ -52,7 +66,7 @@ class messagesController extends Controller
      */
     public function show($id)
     {
-        
+
     }
 
     /**
@@ -75,7 +89,7 @@ class messagesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
     }
 
     /**
