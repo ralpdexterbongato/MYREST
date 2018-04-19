@@ -23,5 +23,9 @@ Route::group([
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
-
+    Route::resource('message','messagesController');
+    Route::put('message-read/{id}','messagesController@read');
+    Route::resource('bookmark','BookMarkController');
+    Route::get('statistics','StatisticController@show');
+    Route::get('unreadCount','messagesController@unreadmailCount');
 });

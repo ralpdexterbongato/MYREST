@@ -1,33 +1,25 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
-use App\message;
-use Session;
-class messagesController extends Controller
+use App\BookMark;
+use Auth;
+use App\User;
+class BookMarkController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['store','unreadmailCount']]);
-    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function __construct()
     {
-        if($request->type=="all")
-        {
-          return message::orderBy('id','DESC')->paginate('10',['id','email','fullname','created_at','read']);
-        }elseif ($request->type == "read")
-        {
-          return message::orderBy('id','DESC')->where('read', '0')->paginate('10',['id','email','fullname','created_at','read']);
-        }elseif ($request->type=="unread")
-        {
-          return message::orderBy('id','DESC')->whereNull('read')->paginate('10',['id','email','fullname','created_at','read']);
-        }
+      $this->middleware('auth:api');
+    }
+    public function index()
+    {
+      $me=User::find(Auth::user()->id);
+      return $me->bookmarkedMessages()->paginate(10);
     }
 
     /**
@@ -48,13 +40,13 @@ class messagesController extends Controller
      */
     public function store(Request $request)
     {
-      $messageDB = new message;
-      $messageDB->fullname = $request->cfullname;
-      $messageDB->email = $request->cemail;
-      $messageDB->budget = $request->cbudget;
-      $messageDB->message = $request->cmessage;
-      $messageDB->save();
-      return ['success'=>'success'];
+      $this->validate($request,[
+        'message_id'=>'unique:book_marks|required',
+      ]);
+        $bookmarkDb = new BookMark;
+        $bookmarkDb->message_id = $request->message_id;
+        $bookmarkDb->user_id = Auth::user()->id;
+        $bookmarkDb->save();
     }
 
     /**
@@ -65,8 +57,7 @@ class messagesController extends Controller
      */
     public function show($id)
     {
-      $this->read($id);
-      return message::where('id',$id)->with('receiver')->get();
+        //
     }
 
     /**
@@ -89,7 +80,7 @@ class messagesController extends Controller
      */
     public function update(Request $request, $id)
     {
-
+        //
     }
 
     /**
@@ -100,14 +91,6 @@ class messagesController extends Controller
      */
     public function destroy($id)
     {
-
-    }
-    public function read($id)
-    {
-      message::where('id',$id)->update(['read'=>0]);
-    }
-    public function unreadmailCount()
-    {
-      return message::whereNull('read')->count();
+        BookMark::where('message_id',$id)->delete();
     }
 }

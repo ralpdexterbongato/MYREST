@@ -5,7 +5,7 @@ namespace App;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
+use Carbon\Carbon;
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
@@ -46,5 +46,15 @@ class User extends Authenticatable implements JWTSubject
    public function getJWTCustomClaims()
    {
        return [];
+   }
+
+   public function getCreatedAtAttribute($date)
+   {
+     return Carbon::createFromFormat('Y-m-d H:i:s',$date)->diffForHumans();
+   }
+
+   public function bookmarkedMessages()
+   {
+    return $this->belongsToMany('App\message','book_marks','user_id','message_id')->withPivot('id','created_at')->orderBy('pivot_id','DESC');
    }
 }
